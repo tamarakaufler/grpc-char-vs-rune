@@ -1,0 +1,19 @@
+excludes:
+
+protoc:
+  version: 3.12.1
+
+lint:
+  group: google
+
+generate:
+  go_options:
+    import_path: github.com/tamarakaufler/grpc-char-to-rune/proto
+
+    extra_modifiers:
+
+  plugins:
+    - name: go
+      type: go
+      flags: plugins=grpc,paths=source_relative
+      output: ../client/
