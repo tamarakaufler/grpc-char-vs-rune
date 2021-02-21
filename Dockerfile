@@ -2,7 +2,7 @@ FROM golang:1.15.8-alpine AS builder
 
 ENV VERSION=unknown
 ENV GIT_SHA=unknown
-ENV NAME=watcher-daemon
+ENV NAME=char-vs-rune
 ENV TIMESTAMP=unknown
 ENV LD_FLAGS="-w -s -X main.Timestamp=${TIMESTAMP} -X main.Version=${VERSION}  -X main.GitSHA=${GIT_SHA} -X main.ServiceName=${NAME}"
 ENV GOLANGCI_VERSION=v1.36.0
@@ -28,9 +28,9 @@ RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/i
 RUN golangci-lint run --out-format=line-number
 RUN go test -count=1 --race -covermode=atomic -coverprofile=coverage.out ./...
 
-RUN go build -o ./bin/watcher-daemon ./cmd/watcher-daemon/main.go
+RUN go build -o ./bin/char-vs-rune ./cmd/char-vs-rune/main.go
 
 
 FROM alpine:3.13
-COPY --from=builder /app/bin/watcher-daemon /bin/watcher-daemon
-ENTRYPOINT [ "/bin/watcher-daemon" ]
+COPY --from=builder /app/bin/char-vs-rune /bin/char-vs-rune
+ENTRYPOINT [ "/bin/char-vs-rune" ]
