@@ -1,3 +1,3 @@
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -fake-name Mock -o char-to-rune/mocks/mocks.go ./ CharToRuneClient
+//go:generate counterfeiter -fake-name Mock -o char-vs-rune/mocks/mocks.go ./char-vs-rune CharVsRuneClient
 
 package client

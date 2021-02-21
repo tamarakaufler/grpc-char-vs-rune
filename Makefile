@@ -4,10 +4,10 @@ NAME     := grpc-char-vs-rune
 GIT_SHA  ?= $(shell git rev-parse --short HEAD)
 GOLANGCI_VERSION = v1.36.0
 
-GOLANGCI := $(shell which golangci-lint 2>/dev/null)
-ifeq ($(GOLANGCI),)
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin ${GOLANGCI_VERSION}
-endif
+# GOLANGCI := $(shell which golangci-lint 2>/dev/null)
+# ifeq ($(GOLANGCI),)
+# 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin ${GOLANGCI_VERSION}
+# endif
 
 deps:
 	@go mod download

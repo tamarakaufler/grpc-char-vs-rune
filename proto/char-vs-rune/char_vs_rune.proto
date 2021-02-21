@@ -1,11 +1,10 @@
 syntax = "proto3";
-package char_vs_rune;
 
-option go_package = "github.com/tamarakaufler/grpc-char-vs-rune/client/char-vs-rune";
+option go_package = "github.com/tamarakaufler/grpc-char-vs-rune/client/char_vs_rune";
 
 service CharVsRune {
-    rpc ToRune(ToRuneRequest) returns (ToRuneResponse) {}
-    rpc ToChar(ToCharRequest) returns (ToCharResponse) {}
+    rpc ToRune(ToRuneRequest) returns (ToRuneResponse);
+    rpc ToChar(ToCharRequest) returns (ToCharResponse);
 }
 
 message ToRuneRequest {
