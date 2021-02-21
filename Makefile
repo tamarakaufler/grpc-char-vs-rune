@@ -48,7 +48,7 @@ run:
 
 docker-run:
 # 	docker build -t grpc-char-vs-rune:v1.0.0 .
-# 	docker run -w /basedir -v $(PWD):/basedir --env WATCHER_DAEMON_EXCLUDED=vendor --env WATCHER_DAEMON_FREQUENCY=3 grpc-char-vs-rune:v1.0.0
+# 	docker run -w /basedir -v $(PWD):/basedir --env AAA=aaa --env BBB=3 grpc-char-vs-rune:v1.0.0
 
 cover:
 	@LOG_LEVEL=debug TMP_COV=$(shell mktemp); \
