@@ -36,3 +36,10 @@ b) If there is an issue regarding the go_package line during the generation, try
 ### client submodule
 
 Used to allow import of only what's needed by the client of this service,ie the protobufs and the related mocks.
+
+NOTE
+
+The protobuf package is defined as char_vs_rune in ./client/char-vs-rune/char-vs-rune.pb.go (see the protobufs section a) above),
+but is imported as:
+
+    "github.com/tamarakaufler/grpc-char-vs-rune/client/char-vs-rune"

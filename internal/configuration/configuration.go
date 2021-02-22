@@ -21,7 +21,10 @@ type Redis struct {
 	ReadTimeout       string `env:"READ_TIMEOUT" envDefault:"5s"`
 	WriteTimeout      string `env:"WRITE_TIMEOUT" envDefault:"5s"`
 	ConnectionTimeout string `env:"CONNECTION_TIMEOUT" envDefault:"5s"`
+	MaxRetries        string `env:"MAX_RETRIES" envDefault:"10"`
 	CacheTTL          string `env:"REDIS_CACHE_TTL" envDefault:"3600s"`
+	PoolSize          string `env:"POOL_SIZE" envDefault:"1"`
+	PoolTimeout       string `envl:"POOL_TIMEOUT"  envDefault:"5s"`
 
 	// MaxIdle     int           `env:"REDIS_MAX_IDLE" envDefault:"3"`
 	// IdleTimeout time.Duration `env:"REDIS_IDLE_TIMEOUT" envDefault:"5s"`
@@ -29,6 +32,8 @@ type Redis struct {
 	// WriteTimeout      time.Duration `env:"WRITE_TIMEOUT" envDefault:"5s"`
 	// ConnectionTimeout time.Duration `env:"CONNECTION_TIMEOUT" envDefault:"5s"`
 	// CacheTTL    time.Duration `env:"REDIS_CACHE_TTL" envDefault:"3600s"`
+	// PoolSize    int           `yaml:"pool_size"`
+	// PoolTimeout time.Duration `yaml:"pool_timeout"
 }
 
 // Metrics represents the configuration for metrics.
