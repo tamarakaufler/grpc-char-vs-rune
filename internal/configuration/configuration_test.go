@@ -4,6 +4,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	conf "github.com/tamarakaufler/grpc-char-vs-rune/internal/configuration"
 )
@@ -25,13 +26,16 @@ func TestNew(t *testing.T) {
 				Redis: conf.Redis{
 					Address:           `localhost:6379`,
 					Password:          ``,
-					MaxActive:         `500`,
-					MaxIdle:           `3`,
-					IdleTimeout:       `5s`,
-					ReadTimeout:       `5s`,
-					WriteTimeout:      `5s`,
-					ConnectionTimeout: `5s`,
-					CacheTTL:          `3600s`,
+					PoolSize:          1,
+					PoolTimeout:       time.Duration(5 * time.Second),
+					MaxActive:         500,
+					MaxIdle:           3,
+					IdleTimeout:       time.Duration(5 * time.Second),
+					ReadTimeout:       time.Duration(5 * time.Second),
+					WriteTimeout:      time.Duration(5 * time.Second),
+					ConnectionTimeout: time.Duration(5 * time.Second),
+					MaxRetries:        10,
+					CacheTTL:          time.Duration(3600 * time.Second),
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "localhost:8125",
@@ -49,13 +53,16 @@ func TestNew(t *testing.T) {
 				Redis: conf.Redis{
 					Address:           `localhost:6379`,
 					Password:          ``,
-					MaxActive:         `500`,
-					MaxIdle:           `3`,
-					IdleTimeout:       `5s`,
-					ReadTimeout:       `5s`,
-					WriteTimeout:      `5s`,
-					ConnectionTimeout: `5s`,
-					CacheTTL:          `3600s`,
+					PoolSize:          1,
+					PoolTimeout:       time.Duration(5 * time.Second),
+					MaxActive:         500,
+					MaxIdle:           3,
+					IdleTimeout:       time.Duration(5 * time.Second),
+					ReadTimeout:       time.Duration(5 * time.Second),
+					WriteTimeout:      time.Duration(5 * time.Second),
+					ConnectionTimeout: time.Duration(5 * time.Second),
+					MaxRetries:        10,
+					CacheTTL:          time.Duration(3600 * time.Second),
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "localhost:8125",
@@ -75,13 +82,16 @@ func TestNew(t *testing.T) {
 				Redis: conf.Redis{
 					Address:           `localhost:6379`,
 					Password:          ``,
-					MaxActive:         `500`,
-					MaxIdle:           `3`,
-					IdleTimeout:       `5s`,
-					ReadTimeout:       `5s`,
-					WriteTimeout:      `5s`,
-					ConnectionTimeout: `5s`,
-					CacheTTL:          `3600s`,
+					PoolSize:          1,
+					PoolTimeout:       time.Duration(5 * time.Second),
+					MaxActive:         500,
+					MaxIdle:           3,
+					IdleTimeout:       time.Duration(5 * time.Second),
+					ReadTimeout:       time.Duration(5 * time.Second),
+					WriteTimeout:      time.Duration(5 * time.Second),
+					ConnectionTimeout: time.Duration(5 * time.Second),
+					MaxRetries:        10,
+					CacheTTL:          time.Duration(3600 * time.Second),
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "127.0.0.1:6666",

@@ -1,6 +1,8 @@
 package configuration
 
 import (
+	"time"
+
 	env "github.com/caarlos0/env/v6"
 )
 
@@ -13,27 +15,18 @@ type Configuration struct {
 
 // Redis holds redis setup.
 type Redis struct {
-	Address           string `env:"REDIS_ADDRESS,required"`
-	Password          string `env:"REDIS_PASSWORD" envDefault:""`
-	MaxActive         string `env:"REDIS_MAX_ACTIVE" envDefault:"500"`
-	MaxIdle           string `env:"REDIS_MAX_IDLE" envDefault:"3"`
-	IdleTimeout       string `env:"REDIS_IDLE_TIMEOUT" envDefault:"5s"` // should be lower than the server timeout
-	ReadTimeout       string `env:"READ_TIMEOUT" envDefault:"5s"`
-	WriteTimeout      string `env:"WRITE_TIMEOUT" envDefault:"5s"`
-	ConnectionTimeout string `env:"CONNECTION_TIMEOUT" envDefault:"5s"`
-	MaxRetries        string `env:"MAX_RETRIES" envDefault:"10"`
-	CacheTTL          string `env:"REDIS_CACHE_TTL" envDefault:"3600s"`
-	PoolSize          string `env:"POOL_SIZE" envDefault:"1"`
-	PoolTimeout       string `envl:"POOL_TIMEOUT"  envDefault:"5s"`
-
-	// MaxIdle     int           `env:"REDIS_MAX_IDLE" envDefault:"3"`
-	// IdleTimeout time.Duration `env:"REDIS_IDLE_TIMEOUT" envDefault:"5s"`
-	// ReadTimeout       time.Duration `env:"READ_TIMEOUT" envDefault:"5s"`
-	// WriteTimeout      time.Duration `env:"WRITE_TIMEOUT" envDefault:"5s"`
-	// ConnectionTimeout time.Duration `env:"CONNECTION_TIMEOUT" envDefault:"5s"`
-	// CacheTTL    time.Duration `env:"REDIS_CACHE_TTL" envDefault:"3600s"`
-	// PoolSize    int           `yaml:"pool_size"`
-	// PoolTimeout time.Duration `yaml:"pool_timeout"
+	Address           string        `env:"REDIS_ADDRESS,required"`
+	Password          string        `env:"REDIS_PASSWORD" envDefault:""`
+	PoolSize          int           `env:"POOL_SIZE" envDefault:"1"`
+	PoolTimeout       time.Duration `env:"POOL_TIMEOUT"  envDefault:"5s"`
+	MaxActive         int           `env:"REDIS_MAX_ACTIVE" envDefault:"500"`
+	MaxIdle           int           `env:"REDIS_MAX_IDLE" envDefault:"3"`
+	IdleTimeout       time.Duration `env:"REDIS_IDLE_TIMEOUT" envDefault:"5s"` // should be lower than the server timeout
+	ReadTimeout       time.Duration `env:"READ_TIMEOUT" envDefault:"5s"`
+	WriteTimeout      time.Duration `env:"WRITE_TIMEOUT" envDefault:"5s"`
+	ConnectionTimeout time.Duration `env:"CONNECTION_TIMEOUT" envDefault:"5s"`
+	MaxRetries        int           `env:"MAX_RETRIES" envDefault:"10"`
+	CacheTTL          time.Duration `env:"REDIS_CACHE_TTL" envDefault:"3600s"`
 }
 
 // Metrics represents the configuration for metrics.
