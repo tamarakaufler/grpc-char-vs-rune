@@ -13,6 +13,7 @@ or running in a Kubernetes cluster.
 
 - Go
 - gRPC
+- redis for caching
 - golangci-lint for code quality
 - protobufs generated with prototool
 - mocks generated with counterfeiter
@@ -20,4 +21,18 @@ or running in a Kubernetes cluster.
 
 ## Details
 
-TODO
+### protobufs
+
+Generated using the Uber's prototool.
+
+a) proto description (char-vs-rune.proto)
+
+    option go_package = "github.com/tamarakaufler/grpc-char-vs-rune/client/char_vs_rune";
+
+    the last part _char_vs_rune_ msut not contain dashes
+
+b) If there is an issue regarding the go_package line during the generation, try upgrading the protoc and the Go grpc related plugins.
+
+### client submodule
+
+Used to allow import of only what's needed by the client of this service,ie the protobufs and the related mocks.
