@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"reflect"
 	"time"
 
 	env "github.com/caarlos0/env/v6"
@@ -22,11 +23,12 @@ type Redis struct {
 	MaxActive         int           `env:"REDIS_MAX_ACTIVE" envDefault:"500"`
 	MaxIdle           int           `env:"REDIS_MAX_IDLE" envDefault:"3"`
 	IdleTimeout       time.Duration `env:"REDIS_IDLE_TIMEOUT" envDefault:"5s"` // should be lower than the server timeout
-	ReadTimeout       time.Duration `env:"READ_TIMEOUT" envDefault:"5s"`
-	WriteTimeout      time.Duration `env:"WRITE_TIMEOUT" envDefault:"5s"`
-	ConnectionTimeout time.Duration `env:"CONNECTION_TIMEOUT" envDefault:"5s"`
-	MaxRetries        int           `env:"MAX_RETRIES" envDefault:"10"`
+	ReadTimeout       time.Duration `env:"REDIS_READ_TIMEOUT" envDefault:"5s"`
+	WriteTimeout      time.Duration `env:"REDIS_WRITE_TIMEOUT" envDefault:"5s"`
+	ConnectionTimeout time.Duration `env:"REDIS_CONNECTION_TIMEOUT" envDefault:"5s"`
+	MaxRetries        int           `env:"REDIS_MAX_RETRIES" envDefault:"10"`
 	CacheTTL          time.Duration `env:"REDIS_CACHE_TTL" envDefault:"3600s"`
+	DB                int           `env:"REDIS_DB" envDefault:"0"`
 }
 
 // Metrics represents the configuration for metrics.
@@ -41,4 +43,15 @@ func New() (*Configuration, error) {
 		return nil, err
 	}
 	return cfg, nil
+}
+
+// ParseFromEnvVarsIntoTypes ...
+func ParseFromEnvVarsIntoTypes(conf interface{}) error {
+	confV := reflect.Indirect(reflect.ValueOf(conf))
+
+	for i := 0; i < confV.NumField(); i++ {
+		if confV.Field(i).Kind() == reflect.Struct {
+		}
+	}
+	return nil
 }

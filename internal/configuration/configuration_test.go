@@ -36,6 +36,7 @@ func TestNew(t *testing.T) {
 					ConnectionTimeout: time.Duration(5 * time.Second),
 					MaxRetries:        10,
 					CacheTTL:          time.Duration(3600 * time.Second),
+					DB:                0,
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "localhost:8125",
@@ -63,6 +64,7 @@ func TestNew(t *testing.T) {
 					ConnectionTimeout: time.Duration(5 * time.Second),
 					MaxRetries:        10,
 					CacheTTL:          time.Duration(3600 * time.Second),
+					DB:                0,
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "localhost:8125",
@@ -92,6 +94,7 @@ func TestNew(t *testing.T) {
 					ConnectionTimeout: time.Duration(5 * time.Second),
 					MaxRetries:        10,
 					CacheTTL:          time.Duration(3600 * time.Second),
+					DB:                0,
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "127.0.0.1:6666",
