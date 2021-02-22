@@ -13,14 +13,21 @@ type Configuration struct {
 
 // Redis holds redis setup.
 type Redis struct {
-	Address     string `env:"REDIS_ADDRESS,required"`
-	Password    string `env:"REDIS_PASSWORD" envDefault:""`
-	MaxIdle     string `env:"REDIS_MAXIDLE" envDefault:"3"`
-	IdleTimeout string `env:"REDIS_IDLE_TIMEOUT" envDefault:"240s"`
-	CacheTTL    string `env:"REDIS_CACHE_TTL" envDefault:"3600s"`
+	Address           string `env:"REDIS_ADDRESS,required"`
+	Password          string `env:"REDIS_PASSWORD" envDefault:""`
+	MaxActive         string `env:"REDIS_MAX_ACTIVE" envDefault:"500"`
+	MaxIdle           string `env:"REDIS_MAX_IDLE" envDefault:"3"`
+	IdleTimeout       string `env:"REDIS_IDLE_TIMEOUT" envDefault:"5s"` // should be lower than the server timeout
+	ReadTimeout       string `env:"READ_TIMEOUT" envDefault:"5s"`
+	WriteTimeout      string `env:"WRITE_TIMEOUT" envDefault:"5s"`
+	ConnectionTimeout string `env:"CONNECTION_TIMEOUT" envDefault:"5s"`
+	CacheTTL          string `env:"REDIS_CACHE_TTL" envDefault:"3600s"`
 
-	// MaxIdle     int           `env:"REDIS_MAXIDLE" envDefault:"3"`
-	// IdleTimeout time.Duration `env:"REDIS_IDLE_TIMEOUT" envDefault:"240s"`
+	// MaxIdle     int           `env:"REDIS_MAX_IDLE" envDefault:"3"`
+	// IdleTimeout time.Duration `env:"REDIS_IDLE_TIMEOUT" envDefault:"5s"`
+	// ReadTimeout       time.Duration `env:"READ_TIMEOUT" envDefault:"5s"`
+	// WriteTimeout      time.Duration `env:"WRITE_TIMEOUT" envDefault:"5s"`
+	// ConnectionTimeout time.Duration `env:"CONNECTION_TIMEOUT" envDefault:"5s"`
 	// CacheTTL    time.Duration `env:"REDIS_CACHE_TTL" envDefault:"3600s"`
 }
 

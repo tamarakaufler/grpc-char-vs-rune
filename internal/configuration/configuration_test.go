@@ -23,11 +23,15 @@ func TestNew(t *testing.T) {
 			want: &conf.Configuration{
 				LogLevel: `info`,
 				Redis: conf.Redis{
-					Address:     `localhost:6379`,
-					Password:    ``,
-					MaxIdle:     `3`,
-					IdleTimeout: `240s`,
-					CacheTTL:    `3600s`,
+					Address:           `localhost:6379`,
+					Password:          ``,
+					MaxActive:         `500`,
+					MaxIdle:           `3`,
+					IdleTimeout:       `5s`,
+					ReadTimeout:       `5s`,
+					WriteTimeout:      `5s`,
+					ConnectionTimeout: `5s`,
+					CacheTTL:          `3600s`,
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "localhost:8125",
@@ -43,11 +47,15 @@ func TestNew(t *testing.T) {
 			want: &conf.Configuration{
 				LogLevel: `info`,
 				Redis: conf.Redis{
-					Address:     `localhost:6379`,
-					Password:    ``,
-					MaxIdle:     `3`,
-					IdleTimeout: `240s`,
-					CacheTTL:    `3600s`,
+					Address:           `localhost:6379`,
+					Password:          ``,
+					MaxActive:         `500`,
+					MaxIdle:           `3`,
+					IdleTimeout:       `5s`,
+					ReadTimeout:       `5s`,
+					WriteTimeout:      `5s`,
+					ConnectionTimeout: `5s`,
+					CacheTTL:          `3600s`,
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "localhost:8125",
@@ -65,11 +73,15 @@ func TestNew(t *testing.T) {
 			want: &conf.Configuration{
 				LogLevel: `debug`,
 				Redis: conf.Redis{
-					Address:     `localhost:6379`,
-					Password:    ``,
-					MaxIdle:     `3`,
-					IdleTimeout: `240s`,
-					CacheTTL:    `3600s`,
+					Address:           `localhost:6379`,
+					Password:          ``,
+					MaxActive:         `500`,
+					MaxIdle:           `3`,
+					IdleTimeout:       `5s`,
+					ReadTimeout:       `5s`,
+					WriteTimeout:      `5s`,
+					ConnectionTimeout: `5s`,
+					CacheTTL:          `3600s`,
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "127.0.0.1:6666",
