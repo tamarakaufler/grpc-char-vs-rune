@@ -8,13 +8,12 @@ import (
 
 // Redis provides redis client.
 type Redis struct {
-	//connectionPool *redis.Pool
 	Client *red.Client
 }
 
 var _ Storage = (*Redis)(nil)
 
-// New ...
+// New provides redis client. Redis customization is done through env variables.
 func New(cfg conf.Configuration) *Redis {
 	return &Redis{
 		Client: red.NewClient(&red.Options{

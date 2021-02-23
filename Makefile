@@ -36,7 +36,7 @@ acceptance-bin:
 
 
 build: LDFLAGS += -X 'main.Timestamp=$(shell date +%s)'
-build: LDFLAGS += -X 'main.Version=${VERSION}'
+build: LDFLAGS += -X 'main.ServiceVersion=${VERSION}'
 build: LDFLAGS += -X 'main.GitSHA=${GIT_SHA}'
 build: LDFLAGS += -X 'main.ServiceName=${FULL_NAME}'
 build:

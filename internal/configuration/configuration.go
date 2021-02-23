@@ -1,7 +1,6 @@
 package configuration
 
 import (
-	"reflect"
 	"time"
 
 	env "github.com/caarlos0/env/v6"
@@ -42,15 +41,4 @@ func Load() (Configuration, error) {
 		return Configuration{}, err
 	}
 	return *cfg, nil
-}
-
-// ParseFromEnvVarsIntoTypes ...
-func ParseFromEnvVarsIntoTypes(conf interface{}) error {
-	confV := reflect.Indirect(reflect.ValueOf(conf))
-
-	for i := 0; i < confV.NumField(); i++ {
-		if confV.Field(i).Kind() == reflect.Struct {
-		}
-	}
-	return nil
 }

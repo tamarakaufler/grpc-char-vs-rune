@@ -4,7 +4,7 @@ ENV VERSION=unknown
 ENV GIT_SHA=unknown
 ENV NAME=char-vs-rune
 ENV TIMESTAMP=unknown
-ENV LD_FLAGS="-w -s -X main.Timestamp=${TIMESTAMP} -X main.Version=${VERSION}  -X main.GitSHA=${GIT_SHA} -X main.ServiceName=${NAME}"
+ENV LD_FLAGS="-w -s -X main.Timestamp=${TIMESTAMP} -X main.ServiceVersion=${VERSION}  -X main.GitSHA=${GIT_SHA} -X main.ServiceName=${NAME}"
 ENV GOLANGCI_VERSION=v1.36.0
 
 RUN echo ${LD_FLAGS}
