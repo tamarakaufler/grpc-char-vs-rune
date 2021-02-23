@@ -4,3 +4,7 @@ services:
     image: "redis:latest"
     ports:
       - 6379:6379
+  telegraph:
+    image: "docker.io/library/telegraf:latest"
+    ports:
+      - 8125:8125

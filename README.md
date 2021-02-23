@@ -43,3 +43,19 @@ The protobuf package is defined as char_vs_rune in ./client/char-vs-rune/char-vs
 but is imported as:
 
     "github.com/tamarakaufler/grpc-char-vs-rune/client/char-vs-rune"
+
+### running auxiliary services
+
+run using docker-compose
+
+#### redis - in-memory store
+
+#### telegraph - StatsD metrics server
+
+NOTE
+
+While _docker pull telegraf_ pulled the image (_docker.io/library/telegraf:latest_), using _telegraph.latest_ as the telegraph image in docker-compose.yml ended with:
+    ERROR: pull access denied for telegraph, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+
+The solution was to use the full name of the image:
+    _docker.io/library/telegraf:latest_
