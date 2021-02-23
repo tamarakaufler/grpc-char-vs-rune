@@ -1,8 +1,6 @@
 package storage
 
 import (
-	//"github.com/gomodule/redigo/redis"
-
 	red "github.com/go-redis/redis/v8"
 
 	conf "github.com/tamarakaufler/grpc-char-vs-rune/internal/configuration"
@@ -17,18 +15,18 @@ type Redis struct {
 var _ Storage = (*Redis)(nil)
 
 // New ...
-func New(conf conf.Configuration) *Redis {
+func New(cfg conf.Configuration) *Redis {
 	return &Redis{
 		Client: red.NewClient(&red.Options{
-			Addr:         conf.Address,
-			Password:     conf.Password,
-			PoolSize:     conf.PoolSize,
-			PoolTimeout:  conf.PoolTimeout,
-			IdleTimeout:  conf.IdleTimeout,
-			ReadTimeout:  conf.ReadTimeout,
-			WriteTimeout: conf.WriteTimeout,
-			MinIdleConns: conf.MinIdleConns,
-			MaxRetries:   conf.MaxRetries,
+			Addr:         cfg.Address,
+			Password:     cfg.Password,
+			PoolSize:     cfg.PoolSize,
+			PoolTimeout:  cfg.PoolTimeout,
+			IdleTimeout:  cfg.IdleTimeout,
+			ReadTimeout:  cfg.ReadTimeout,
+			WriteTimeout: cfg.WriteTimeout,
+			MinIdleConns: cfg.MinIdleConns,
+			MaxRetries:   cfg.MaxRetries,
 			DB:           0,
 		}),
 	}

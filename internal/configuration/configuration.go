@@ -35,8 +35,8 @@ type Metrics struct {
 	StatsdAddress string `env:"STATSD_ADDRESS" envDefault:"localhost:8125"` // telegraph
 }
 
-// New provides new configuration, using env variable overrides if they are set up.
-func New() (Configuration, error) {
+// Load provides new configuration, using env variable overrides if they are set up.
+func Load() (Configuration, error) {
 	cfg := &Configuration{}
 	if err := env.Parse(cfg); err != nil {
 		return Configuration{}, err

@@ -9,7 +9,7 @@ import (
 	conf "github.com/tamarakaufler/grpc-char-vs-rune/internal/configuration"
 )
 
-func TestNew(t *testing.T) {
+func TestLoad(t *testing.T) {
 	tests := []struct {
 		name    string
 		envs    map[string]string
@@ -107,13 +107,13 @@ func TestNew(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			setEnvs(tt.envs)
-			got, err := conf.New()
+			got, err := conf.Load()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Load() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("New() = %v, want %v", got, tt.want)
+				t.Errorf("Load() = %v, want %v", got, tt.want)
 			}
 		})
 		unsetEnvs(tt.envs)
