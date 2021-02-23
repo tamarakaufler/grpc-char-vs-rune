@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 
+	"github.com/tamarakaufler/grpc-char-vs-rune/internal/lib-service-run/status"
 	"google.golang.org/grpc"
 )
 
@@ -12,10 +13,11 @@ type Options struct {
 	Name         string
 	Version      string
 	Address      string
+	StatusPort   int
 	Context      context.Context
 	Interceptors []grpc.UnaryServerInterceptor
 
-	readinessChecks []Check
+	readinessChecks []status.Check
 }
 
 func setOptions(options ...Option) (*Options, error) {
@@ -26,7 +28,7 @@ func setOptions(options ...Option) (*Options, error) {
 		Context:      context.Background(),
 		Interceptors: []grpc.UnaryServerInterceptor{},
 	}
-	o.readinessChecks = []Check{o.defaultServerCheck}
+	o.readinessChecks = []status.Check{o.defaultServerCheck}
 
 	for _, option := range options {
 		option(o)
@@ -40,7 +42,7 @@ func (o *Options) defaultServerCheck() error {
 	if err != nil {
 		return err
 	}
-	return serverCheck(port)()
+	return status.ServerCheck(port)()
 }
 
 // Option is a method for customizing server property.
@@ -61,6 +63,12 @@ func WithVersion(version string) Option {
 func WithAddress(address string) Option {
 	return func(o *Options) {
 		o.Address = address
+	}
+}
+
+func WithStatusPort(port int) Option {
+	return func(o *Options) {
+		o.StatusPort = port
 	}
 }
 

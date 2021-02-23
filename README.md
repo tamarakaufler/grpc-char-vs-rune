@@ -14,7 +14,7 @@ or running in a Kubernetes cluster.
 - Go
 - gRPC
 - redis for caching
-- golangci-lint for code quality
+- golangci-lint for code quality (https://raw.githubusercontent.com/golangci/golangci-lint/master/.golangci.example.yml)
 - protobufs generated with prototool
 - mocks generated with counterfeiter
 - docker, docker-compose

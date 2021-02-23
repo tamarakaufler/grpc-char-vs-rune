@@ -1,18 +1,16 @@
 package grpc
 
 import (
-	"context"
 	"log"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"github.com/tamarakaufler/grpc-char-vs-rune/internal/lib-service-run/status"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // Server dictates what methods/APIs this service must provide.
@@ -26,7 +24,7 @@ type Server interface {
 type service struct {
 	options *Options
 	server  *grpc.Server
-	//status  *status.LivenessAndReadinessStatus
+	status  *status.LivenessReadiness
 
 	stop chan struct{}
 }
@@ -55,6 +53,20 @@ func New(opts ...Option) (Server, error) {
 		stop: make(chan struct{}),
 	}
 
+	l := logrus.New().WithFields(logrus.Fields{
+		"service_name":    s.options.Name,
+		"service_version": s.options.Version,
+	})
+	s.status = status.LivenessReadinessServer(l, func() error {
+		for _, f := range options.readinessChecks {
+			if err := f(); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	s.status.Port = s.options.StatusPort
+
 	return s, nil
 }
 
@@ -67,6 +79,10 @@ func (s *service) Server() *grpc.Server {
 }
 
 func (s *service) Run() error {
+	if s.status != nil {
+		go s.status.Start()
+	}
+
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 
@@ -101,31 +117,4 @@ func (s *service) Stop() error {
 	s.stop <- struct{}{}
 
 	return nil
-}
-
-// Check is a verifying function to be run, returning error .
-type Check func() error
-
-// ServerCheck verifies the server is running.
-// It invokes an unimplemented gRPC method and if the error is not Unimplemented, then
-// the server is not running.
-func serverCheck(port string) Check {
-	return func() error {
-		conn, err := grpc.Dial(net.JoinHostPort("127.0.0.1", port), grpc.WithInsecure())
-		if err != nil {
-			return err
-		}
-		defer conn.Close()
-
-		err = conn.Invoke(context.Background(), "/ping/pong", &empty.Empty{}, &empty.Empty{})
-		s, ok := status.FromError(err)
-		if !ok {
-			return errors.New("unable to parse grpc error")
-		}
-		if s.Code() != codes.Unimplemented {
-			return errors.Wrapf(err, "expected code %d but got %d", codes.Unimplemented, s.Code())
-		}
-
-		return nil
-	}
 }
