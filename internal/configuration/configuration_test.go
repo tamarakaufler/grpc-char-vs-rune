@@ -13,7 +13,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name    string
 		envs    map[string]string
-		want    *conf.Configuration
+		want    conf.Configuration
 		wantErr bool
 	}{
 		{
@@ -21,7 +21,7 @@ func TestNew(t *testing.T) {
 			envs: map[string]string{
 				"REDIS_ADDRESS": "localhost:6379",
 			},
-			want: &conf.Configuration{
+			want: conf.Configuration{
 				LogLevel: `info`,
 				Redis: conf.Redis{
 					Address:      `localhost:6379`,
@@ -46,7 +46,7 @@ func TestNew(t *testing.T) {
 			envs: map[string]string{
 				"REDIS_ADDRESS": "localhost:6379",
 			},
-			want: &conf.Configuration{
+			want: conf.Configuration{
 				LogLevel: `info`,
 				Redis: conf.Redis{
 					Address:      `localhost:6379`,
@@ -73,7 +73,7 @@ func TestNew(t *testing.T) {
 				"LOG_LEVEL":      "debug",
 				"STATSD_ADDRESS": "127.0.0.1:6666",
 			},
-			want: &conf.Configuration{
+			want: conf.Configuration{
 				LogLevel: `debug`,
 				Redis: conf.Redis{
 					Address:      `localhost:6379`,
@@ -99,7 +99,7 @@ func TestNew(t *testing.T) {
 				"LOG_LEVEL":      "debug",
 				"STATSD_ADDRESS": "127.0.0.1:6666",
 			},
-			want:    nil,
+			want:    conf.Configuration{},
 			wantErr: true,
 		},
 	}

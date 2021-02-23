@@ -36,12 +36,12 @@ type Metrics struct {
 }
 
 // New provides new configuration, using env variable overrides if they are set up.
-func New() (*Configuration, error) {
+func New() (Configuration, error) {
 	cfg := &Configuration{}
 	if err := env.Parse(cfg); err != nil {
-		return nil, err
+		return Configuration{}, err
 	}
-	return cfg, nil
+	return *cfg, nil
 }
 
 // ParseFromEnvVarsIntoTypes ...
