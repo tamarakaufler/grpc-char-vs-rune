@@ -1,0 +1,4 @@
+FROM alpine:3.13
+
+COPY cmd/bin/char-vs-rune /app/bin/
+ENTRYPOINT [ "/app/bin/char-vs-rune" ]

@@ -44,9 +44,11 @@ but is imported as:
 
     "github.com/tamarakaufler/grpc-char-vs-rune/client/char-vs-rune"
 
-### running auxiliary services
+### running services
 
-run using docker-compose
+run and stop using docker-compose:
+  - make services-start
+  - make services-stop
 
 #### redis - in-memory store
 
@@ -59,3 +61,7 @@ While _docker pull telegraf_ pulled the image (_docker.io/library/telegraf:lates
 
 The solution was to use the full name of the image:
     _docker.io/library/telegraf:latest_
+
+**Telegraf configuration**
+
+Needs to contain at least one _inputs_ configurations and one _outputs_ configuration.

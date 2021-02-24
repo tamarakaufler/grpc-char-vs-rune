@@ -53,6 +53,14 @@ docker-run:
 redis-run:
 	docker-compose up -d redis
 
+# starts this service, redis, telegraph and influxdb
+services-start:
+	docker-compose up -d
+
+services-stop:
+	docker-compose stop
+	docker-compose down --remove-orphans
+
 cover:
 	@LOG_LEVEL=debug TMP_COV=$(shell mktemp); \
 	go test -failfast -coverpkg=./... -coverprofile=$$TMP_COV ./... && \
@@ -60,4 +68,4 @@ cover:
 
 all: deps protoc lint test build
 
-.PHONY: deps tools lint protoc mock test acceptance-bin cover build run docker-run redis-run
+.PHONY: deps tools lint protoc mock test acceptance-bin cover build run docker-run redis-run services-start services-stop

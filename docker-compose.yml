@@ -1,10 +1,46 @@
-version: "2.1"
+version: "3.3"
 services:
+  char_vs_rune:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - redis
+
   redis:
     image: "redis:latest"
     ports:
       - 6379:6379
-  telegraph:
-    image: "docker.io/library/telegraf:latest"
+
+  influxdb:
+    image: quay.io/influxdb/influxdb:v2.0.3
+    ports:
+      - 8086:8086
+    volumes:
+     # Mount for influxdb data directory and configuration
+      - ./sink/influxdbv2:/.influxdbv2:rw
+
+  # Use the influx cli to set up an influxdb instance.
+  influxdb_cli:
+    links:
+      - influxdb
+    image: quay.io/influxdb/influxdb:v2.0.3
+  # Use these same configurations parameters in your telegraf configuration, mytelegraf.conf.
+    entrypoint: influx setup --bucket char_vs_rune -t mytoken -o noprofit-org --username=myusername --password=mypassword --host=http://influxdb:8086 -f
+      # Wait for the influxd service in the influxdb container has fully bootstrapped before trying to setup an influxdb instance with the influxdb_cli service. 
+    restart: on-failure:20
+    depends_on:
+      - influxdb
+
+  telegraf:
+    image: docker.io/library/telegraf:latest
     ports:
       - 8125:8125
+    links:
+      - influxdb
+    volumes:
+      # Mount for telegraf config
+      - ./internal/configuration/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+    restart: on-failure:10
+    depends_on:
+      - influxdb_cli
