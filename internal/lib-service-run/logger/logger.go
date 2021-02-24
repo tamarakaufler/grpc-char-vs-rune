@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	logLevelKey = "LOG_LEVEL"
+	logLevelEnvKey = "LOG_LEVEL"
 )
 
 // New constructs a new default logger.
@@ -31,9 +31,8 @@ func New() *logrus.Entry {
 			"service":         os.Getenv("SERVICE_NAME"),
 			"service-version": os.Getenv("SERVICE_VERSION"),
 		}
-		//logger.WithFields(defaultFields)
 
-		customLogLevel := os.Getenv(logLevelKey)
+		customLogLevel := os.Getenv(logLevelEnvKey)
 		logLevel, err := logrus.ParseLevel(customLogLevel)
 		if err != nil {
 			logger.Warnf("could not set custom log level: %s, using info level", err.Error())
