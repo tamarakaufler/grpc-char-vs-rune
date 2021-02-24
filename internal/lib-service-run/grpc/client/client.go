@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Client interface dictates methods to be implemented to
+// Client interface prescribes methods to be implemented to
 // create a grpc client instance.
 type Client interface {
 	Options() *Options
@@ -33,8 +33,6 @@ func (c *client) Conn() *grpc.ClientConn {
 func (c *client) Close() error {
 	return c.conn.Close()
 }
-
-//var dialOptions []grpc.DialOption
 
 // New creates a new grpc Client.
 func New(opts ...Option) (Client, error) {
