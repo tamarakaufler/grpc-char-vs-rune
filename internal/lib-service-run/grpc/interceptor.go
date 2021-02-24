@@ -19,14 +19,14 @@ func UnaryChain(
 	) (interface{}, error) {
 		for i := len(interceptors) - 1; i >= 0; i-- {
 			interceptor := interceptors[i]
-			handler = wrapUnaryHandler(interceptor, info, handler)
+			handler = activateInterceptor(interceptor, info, handler)
 		}
 		return handler(ctx, req)
 	}
 }
 
-// WrapUnaryHandler wraps a unary handler with an unary server interceptor.
-func wrapUnaryHandler(
+// activateInterceptor wraps a unary handler with an unary server interceptor.
+func activateInterceptor(
 	interceptor grpc.UnaryServerInterceptor,
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler,

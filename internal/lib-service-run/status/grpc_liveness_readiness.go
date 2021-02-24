@@ -20,7 +20,7 @@ type Check func() error
 // TODO:
 // This needs an implementation of a helper script, that will envoke this function. The script
 // can be used as a Kubernetes liveness/readiness probe.
-// endpoint must start with a slash, eg /ping/pong
+// endpoint must start with a slash, eg /ping/pong.
 func ServerCheck(port, endpoint string) Check {
 	return func() error {
 		conn, err := grpc.Dial(net.JoinHostPort("127.0.0.1", port), grpc.WithInsecure())
