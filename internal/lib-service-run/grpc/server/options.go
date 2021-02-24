@@ -28,11 +28,14 @@ func setOptions(options ...Option) (*Options, error) {
 		Context:      context.Background(),
 		Interceptors: []grpc.UnaryServerInterceptor{},
 	}
-	o.readinessChecks = []status.Check{o.defaultServerCheck}
-
 	for _, option := range options {
 		option(o)
 	}
+
+	o.readinessChecks = []status.Check{o.defaultServerCheck}
+
+	defaultInterceptors := []grpc.UnaryServerInterceptor{}
+	o.Interceptors = append(defaultInterceptors, o.Interceptors...)
 
 	return o, nil
 }
