@@ -50,6 +50,7 @@ run and stop using docker-compose:
   - make services-start
   - make services-stop
 
+
 #### redis - in-memory store
 
 #### telegraph - StatsD metrics server
@@ -65,3 +66,9 @@ The solution was to use the full name of the image:
 **Telegraf configuration**
 
 Needs to contain at least one _inputs_ configurations and one _outputs_ configuration.
+
+
+## Links
+
+https://www.influxdata.com/blog/running-influxdb-2-0-and-telegraf-using-docker/
+https://github.com/influxdata/telegraf/blob/master/etc/telegraf.conf
