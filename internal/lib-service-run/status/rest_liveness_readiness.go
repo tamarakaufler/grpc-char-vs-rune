@@ -3,17 +3,11 @@ package status
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/http"
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // LivenessReadiness representing Status server object.
@@ -29,11 +23,15 @@ type LivenessReadiness struct {
 	wg sync.WaitGroup
 }
 
-// LivenessReadinessServer Create a new Status Server, but do not start it.
-// Port is overriden by server.New but left 8000 here to avoid a breaking change.
+// LivenessReadinessServer creates LivenessReadiness instance
+// NOTE: This is not great as the application will be serving on a different port, so
+// the LivenessReadinessServer may be giving good response while the application itself
+// may be unavailable.
+// TODO:
+// A better way is to attach (if not already implemented) a new API/route to the TEST/HRRP server.
 func LivenessReadinessServer(logger *logrus.Entry, readinessCheck Check) *LivenessReadiness {
 	return &LivenessReadiness{
-		Port:           3000,
+		Port:           8000,
 		logger:         logger,
 		liveness:       UNAVAILABLE,
 		readinessCheck: readinessCheck,
@@ -43,8 +41,8 @@ func LivenessReadinessServer(logger *logrus.Entry, readinessCheck Check) *Livene
 // Start registers HTTP handlers and start server.
 func (s *LivenessReadiness) Start() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/status/liveness", s.LivenessProbe)
-	mux.HandleFunc("/status/readiness", s.ReadinessProbe)
+	mux.HandleFunc("/liveness", s.LivenessProbe)
+	mux.HandleFunc("/readiness", s.ReadinessProbe)
 
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", s.Port), Handler: mux}
 
@@ -56,7 +54,7 @@ func (s *LivenessReadiness) Start() {
 	s.wg.Done()
 
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		s.logger.Fatalf("error while serving http on port %d: %+v", s.Port, err)
+		s.logger.Fatalf("liveness/readiness server error listening on port %d: %+v", s.Port, err)
 	}
 }
 
@@ -104,31 +102,4 @@ func (s *LivenessReadiness) ReadinessProbe(w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Content-Type", "application/json")
 
 	fmt.Fprintf(w, `{"status": "%s"}`, http.StatusText(code))
-}
-
-// Check is a verifying function to be run, returning error .
-type Check func() error
-
-// ServerCheck verifies the server is running.
-// It invokes an unimplemented gRPC method and if the error is not Unimplemented, then
-// the server is not running.
-func ServerCheck(port string) Check {
-	return func() error {
-		conn, err := grpc.Dial(net.JoinHostPort("127.0.0.1", port), grpc.WithInsecure())
-		if err != nil {
-			return err
-		}
-		defer conn.Close()
-
-		err = conn.Invoke(context.Background(), "/ping/pong", &empty.Empty{}, &empty.Empty{})
-		s, ok := status.FromError(err)
-		if !ok {
-			return errors.New("unable to parse grpc error")
-		}
-		if s.Code() != codes.Unimplemented {
-			return errors.Wrapf(err, "expected code %d but got %d", codes.Unimplemented, s.Code())
-		}
-
-		return nil
-	}
 }

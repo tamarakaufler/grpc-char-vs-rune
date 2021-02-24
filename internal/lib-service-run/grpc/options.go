@@ -42,7 +42,7 @@ func (o *Options) defaultServerCheck() error {
 	if err != nil {
 		return err
 	}
-	return status.ServerCheck(port)()
+	return status.ServerCheck(port, "/ping/pong")()
 }
 
 // Option is a method for customizing server property.
