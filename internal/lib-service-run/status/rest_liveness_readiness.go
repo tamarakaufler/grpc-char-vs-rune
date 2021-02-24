@@ -31,7 +31,7 @@ type LivenessReadiness struct {
 // A better way is to attach (if not already implemented) a new API/route to the TEST/HRRP server.
 func LivenessReadinessServer(logger *logrus.Entry, readinessCheck Check) *LivenessReadiness {
 	return &LivenessReadiness{
-		Port:           8000,
+		Port:           8888,
 		logger:         logger,
 		liveness:       UNAVAILABLE,
 		readinessCheck: readinessCheck,
