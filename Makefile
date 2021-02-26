@@ -28,7 +28,7 @@ mock:
 	go generate ./..
 
 test:
-	go test -count=1 --race -covermode=atomic -coverprofile=coverage.out ./...
+	go test -count=1 -tags unit_tests --race -covermode=atomic -coverprofile=coverage.out ./...
 
 acceptance-bin:
 	CGO_ENABLED=0 go test -o bin/acceptancetests -c -v -tags acceptance_test \

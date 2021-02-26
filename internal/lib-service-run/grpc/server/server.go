@@ -17,14 +17,14 @@ import (
 type Server interface {
 	Options() *Options
 	Server() *grpc.Server
-	Run() error
+	Start() error
 	Stop() error
 }
 
 type service struct {
 	options *Options
 	server  *grpc.Server
-	status  *status.LivenessReadiness
+	status  *status.Probe
 
 	stop chan struct{}
 }
@@ -70,15 +70,18 @@ func New(opts ...Option) (Server, error) {
 	return s, nil
 }
 
+// Options is an options field getter.
 func (s *service) Options() *Options {
 	return s.options
 }
 
+// Server is a server field getter.
 func (s *service) Server() *grpc.Server {
 	return s.server
 }
 
-func (s *service) Run() error {
+// Start starts the gRPC server.
+func (s *service) Start() error {
 	if s.status != nil {
 		go s.status.Start()
 	}

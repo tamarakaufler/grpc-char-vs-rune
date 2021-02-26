@@ -10,8 +10,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// LivenessReadiness representing Status server object.
-type LivenessReadiness struct {
+// Probe represents liveneass and readiness probe object.
+type Probe struct {
 	Port           int
 	logger         *logrus.Entry
 	liveness       Status
@@ -23,14 +23,15 @@ type LivenessReadiness struct {
 	wg sync.WaitGroup
 }
 
-// LivenessReadinessServer creates LivenessReadiness instance
+// LivenessReadinessServer creates LivenessReadiness instance.
 // NOTE: This is not great as the application will be serving on a different port, so
 // the LivenessReadinessServer may be giving good response while the application itself
 // may be unavailable.
 // TODO:
-// A better way is to attach (if not already implemented) a new API/route to the TEST/HRRP server.
-func LivenessReadinessServer(logger *logrus.Entry, readinessCheck Check) *LivenessReadiness {
-	return &LivenessReadiness{
+// rest service to expose an endpoint for doing the checks.
+// gRPC service to expose an endpoint for doing liveness check (status.Check).
+func LivenessReadinessServer(logger *logrus.Entry, readinessCheck Check) *Probe {
+	return &Probe{
 		Port:           8888,
 		logger:         logger,
 		liveness:       UNAVAILABLE,
@@ -39,12 +40,17 @@ func LivenessReadinessServer(logger *logrus.Entry, readinessCheck Check) *Livene
 }
 
 // Start registers HTTP handlers and start server.
-func (s *LivenessReadiness) Start() {
+func (s *Probe) Start() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/liveness", s.LivenessProbe)
-	mux.HandleFunc("/readiness", s.ReadinessProbe)
+	mux.HandleFunc("/liveness", s.Liveness)
+	mux.HandleFunc("/readiness", s.Readiness)
 
-	srv := &http.Server{Addr: fmt.Sprintf(":%d", s.Port), Handler: mux}
+	addr := fmt.Sprintf(":%d", 8888)
+	if s.Port != 0 {
+		addr = fmt.Sprintf(":%d", s.Port)
+	}
+	srv := &http.Server{Addr: addr, Handler: mux}
+	s.logger.Infof("Starting liveness/readiness probe on %s", addr)
 
 	s.wg.Add(1)
 	s.lock.Lock()
@@ -53,13 +59,16 @@ func (s *LivenessReadiness) Start() {
 	s.lock.Unlock()
 	s.wg.Done()
 
+	s.logger.Infof("Liveness status: %d", s.liveness)
+
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		s.liveness = UNAVAILABLE
 		s.logger.Fatalf("liveness/readiness server error listening on port %d: %+v", s.Port, err)
 	}
 }
 
 // Stop closes the listener used for running the server.
-func (s *LivenessReadiness) Stop() error {
+func (s *Probe) Stop() error {
 	s.wg.Wait()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -69,15 +78,15 @@ func (s *LivenessReadiness) Stop() error {
 	return nil
 }
 
-// SetLiveness sets liveness of application to be reported on probes.
-func (s *LivenessReadiness) SetLiveness(status Status) {
+// SetLiveness sets liveness of application to be reported on Probes.
+func (s *Probe) SetLiveness(status Status) {
 	s.lock.Lock()
 	s.liveness = status
 	s.lock.Unlock()
 }
 
-// LivenessProbe Handler for Kubernetes readiness check and checking service status.
-func (s *LivenessReadiness) LivenessProbe(w http.ResponseWriter, r *http.Request) {
+// Liveness endpoint for Kubernetes readiness check and checking service status.
+func (s *Probe) Liveness(w http.ResponseWriter, r *http.Request) {
 	s.lock.RLock()
 	code := int(s.liveness)
 	s.lock.RUnlock()
@@ -88,8 +97,8 @@ func (s *LivenessReadiness) LivenessProbe(w http.ResponseWriter, r *http.Request
 	fmt.Fprintf(w, `{"status": "%s"}`, http.StatusText(code))
 }
 
-// ReadinessProbe Handler for Kubernetes readiness check and checking service status.
-func (s *LivenessReadiness) ReadinessProbe(w http.ResponseWriter, r *http.Request) {
+// Readiness endpoint for Kubernetes readiness check and checking service status.
+func (s *Probe) Readiness(w http.ResponseWriter, r *http.Request) {
 	var code = int(UNAVAILABLE)
 	err := s.readinessCheck()
 	if err == nil {

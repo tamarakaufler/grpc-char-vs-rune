@@ -1,3 +1,5 @@
+// +build unit_tests
+
 package configuration_test
 
 import (

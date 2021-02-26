@@ -19,7 +19,7 @@ type Check func() error
 // the server is not running.
 // TODO:
 // This needs an implementation of a helper script, that will envoke this function. The script
-// can be used as a Kubernetes liveness/readiness probe.
+// can be used as a Kubernetes liveness/readiness Probe.
 // endpoint must start with a slash, eg /ping/pong.
 func ServerCheck(port, endpoint string) Check {
 	return func() error {

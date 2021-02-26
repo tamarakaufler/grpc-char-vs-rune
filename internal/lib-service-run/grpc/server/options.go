@@ -51,36 +51,42 @@ func (o *Options) defaultServerCheck() error {
 // Option is a method for customizing server property.
 type Option func(*Options)
 
+// WithName ...
 func WithName(name string) Option {
 	return func(o *Options) {
 		o.Name = name
 	}
 }
 
+// WithVersion ...
 func WithVersion(version string) Option {
 	return func(o *Options) {
 		o.Version = version
 	}
 }
 
+// WithAddress ...
 func WithAddress(address string) Option {
 	return func(o *Options) {
 		o.Address = address
 	}
 }
 
+// WithStatusPort ...
 func WithStatusPort(port int) Option {
 	return func(o *Options) {
 		o.StatusPort = port
 	}
 }
 
+// WithContext ...
 func WithContext(ctx context.Context) Option {
 	return func(o *Options) {
 		o.Context = ctx
 	}
 }
 
+// WithInterceptors ...
 func WithInterceptors(interceptors ...grpc.UnaryServerInterceptor) Option {
 	return func(o *Options) {
 		o.Interceptors = interceptors
