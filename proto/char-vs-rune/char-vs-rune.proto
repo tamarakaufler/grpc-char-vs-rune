@@ -12,7 +12,7 @@ message ToRuneRequest {
 }
 
 message ToRuneResponse {
-    repeated uint32 in_runes = 1;
+    repeated uint32 runes = 1;
     // repeated uint32 in_bytes = 2;
     map<string, uint32> mapping = 3;
     // map<string, Bytes> bytes = 4;

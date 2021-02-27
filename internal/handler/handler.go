@@ -91,7 +91,7 @@ func (h *Handler) ToRune(ctx context.Context, req *proto.ToRuneRequest) (*proto.
 	}
 
 	return &proto.ToRuneResponse{
-		InRunes: r,
+		Runes:   r,
 		Mapping: m,
 	}, nil
 }
@@ -125,7 +125,7 @@ func ConvertToRuneResponse(s string, v []uint32) *proto.ToRuneResponse {
 	}
 
 	return &proto.ToRuneResponse{
-		InRunes: v,
+		Runes:   v,
 		Mapping: m,
 	}
 }
