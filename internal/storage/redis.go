@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 	"encoding/base64"
-	"strconv"
+	"encoding/json"
 	"time"
 
 	red "github.com/go-redis/redis/v8"
@@ -13,21 +13,11 @@ import (
 	libLogger "github.com/tamarakaufler/grpc-char-vs-rune/internal/lib-service-run/logger"
 )
 
-// const (
-// 	tableToRune = "charToRune"
-// 	tableToChar = "runeToChar"
-// )
-
 var ttl = 3600 * time.Second
 
-// type Uint32 []uint32
-
-// type CharToRune struct {
-// 	Mapping map[string]string `json:"mapping,omitempty"`
-// }
-
-type CharToRune struct {
-	Mapping []uint32 `json:"mapping,omitempty"`
+// charToRune is a helper type used for storing data in redis.
+type charToRune struct {
+	List []uint32 `json:"list,omitempty"`
 }
 
 // Redis provides redis client.
@@ -66,20 +56,18 @@ func New(cfg conf.Configuration) *Redis {
 }
 
 // StoreCharToRune ...
-func (r *Redis) StoreCharToRune(ctx context.Context, s string, uis []uint32) error {
-	ss := []string{}
-	for _, el := range uis {
-		ssel := strconv.FormatUint(uint64(el), 10)
-		ss = append(ss, ssel)
+func (r *Redis) StoreCharToRune(ctx context.Context, key string, uis []uint32) error {
+	chtr := charToRune{
+		List: uis,
 	}
-
-	err := r.Client.RPush(ctx, s, ss).Err()
+	v, err := json.Marshal(chtr)
 	if err != nil {
 		return err
 	}
-	_, err = r.Client.Expire(ctx, s, r.TTL).Result()
+
+	err = r.Client.Set(ctx, key, v, r.TTL).Err()
 	if err != nil {
-		r.Logger.Warnf("cannot set expiry on key %s", s)
+		return err
 	}
 
 	return nil
@@ -87,31 +75,22 @@ func (r *Redis) StoreCharToRune(ctx context.Context, s string, uis []uint32) err
 
 // GetCharToRune ...
 func (r *Redis) GetCharToRune(ctx context.Context, key string) ([]uint32, error) {
-	uis := []uint32{}
-
-	for range key {
-		el, err := r.Client.LPop(ctx, key).Result()
-		if err != nil {
-			return nil, err
-		}
-		v, err := strconv.Atoi(el)
-		if err != nil {
-			return nil, err
-		}
-		uis = append(uis, uint32(v))
+	v, err := r.Client.Get(ctx, key).Result()
+	if err != nil {
+		return nil, err
 	}
 
-	// err := r.StoreCharToRune(ctx, key, uis)
-	// if err != nil {
-	// 	r.Logger.Warnf("cound not store key %s", key)
-	// }
+	chtr := charToRune{}
+	err = json.Unmarshal([]byte(v), &chtr)
+	if err != nil {
+		return nil, err
+	}
 
-	return uis, nil
+	return chtr.List, nil
 }
 
 // StoreRuneToChar ...
 func (r *Redis) StoreRuneToChar(ctx context.Context, rs []byte, s string) error {
-
 	key := base64.StdEncoding.EncodeToString(rs)
 	err := r.Client.Set(ctx, key, s, r.TTL).Err()
 	if err != nil {

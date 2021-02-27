@@ -44,6 +44,13 @@ func TestRedisStorage(t *testing.T) {
 			require.EqualError(t, err, "redis: nil")
 			require.Equal(t, "", v)
 		}
+
+		err = r.StoreRuneToChar(ctx, rs, s)
+		require.NoError(t, err)
+
+		v, err = r.GetRuneToChar(ctx, rs)
+		require.NoError(t, err)
+		require.Equal(t, s, v)
 	})
 
 	t.Run("StoreRetrieveCharToRune", func(t *testing.T) {
@@ -66,20 +73,19 @@ func TestRedisStorage(t *testing.T) {
 		require.NoError(t, err)
 		require.EqualValues(t, expected, v)
 
-		tick := time.NewTimer(600 * time.Millisecond)
-		for {
-			select {
-			case <-tick.C:
-				v, err := r.GetCharToRune(ctx, s)
-				require.NoError(t, err)
-				require.EqualValues(t, expected, v)
-			case <-time.After(d):
-				v, err := r.GetCharToRune(ctx, s)
-				require.Error(t, err, "redis: nil")
-				require.Equal(t, []uint32(nil), v)
-				break
-			}
+		select {
+		case <-time.After(d):
+			v, err := r.GetCharToRune(ctx, s)
+			require.EqualError(t, err, "redis: nil")
+			require.Equal(t, []uint32(nil), v)
 		}
+
+		err = r.StoreCharToRune(ctx, s, expected)
+		require.NoError(t, err)
+
+		v, err = r.GetCharToRune(ctx, s)
+		require.NoError(t, err)
+		require.EqualValues(t, expected, v)
 	})
 }
 
@@ -98,7 +104,7 @@ func setup(t *testing.T) (*redis.Client, func()) {
 	addr := net.JoinHostPort("localhost", resource.GetPort("6379/tcp"))
 
 	ctx := context.Background()
-	// wait for the container to be ready
+	// waiting for the container to be ready
 	err = pool.Retry(func() error {
 		var e error
 		client := redis.NewClient(&redis.Options{
