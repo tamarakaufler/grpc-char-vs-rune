@@ -1,5 +1,3 @@
-// +build unit_tests
-
 package handler_test
 
 import (
