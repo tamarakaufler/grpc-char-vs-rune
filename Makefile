@@ -28,11 +28,17 @@ mock:
 	go generate ./..
 
 test:
-	go test -count=1 -tags unit_tests --race -covermode=atomic -coverprofile=coverage.out ./...
+	go test -count=1 -tags unit_tests --race -covermode=atomic -coverprofile=coverage1.out ./...
 
-acceptance-bin:
-	CGO_ENABLED=0 go test -o bin/acceptancetests -c -v -tags acceptance_test \
-	./acceptance_test ./acceptance
+integration-test:
+	go test -count=1 -tags integration_tests --race -covermode=atomic -coverprofile=coverage2.out ./...
+
+all-test:
+	go test -count=1 -tags unit_tests,integration_tests --race -covermode=atomic -coverprofile=coverage.out ./...	
+
+# acceptance-bin:
+# 	CGO_ENABLED=0 go test -o bin/acceptancetests -c -v -tags acceptance_test \
+# 	./acceptance_test ./acceptance
 
 
 build: LDFLAGS += -X 'main.Timestamp=$(shell date +%s)'
@@ -53,7 +59,7 @@ docker-run:
 redis-run:
 	docker-compose up -d redis
 
-# starts this service, redis, telegraph and influxdb
+# starts grpc-char-vs-rune, redis, telegraph and influxdb
 services-start:
 	docker-compose up -d
 
@@ -66,6 +72,6 @@ cover:
 	go test -failfast -coverpkg=./... -coverprofile=$$TMP_COV ./... && \
 	go tool cover -html=$$TMP_COV && rm $$TMP_COV
 
-all: deps protoc lint test build
+all: deps protoc lint all-test build
 
-.PHONY: deps tools lint protoc mock test acceptance-bin cover build run docker-run redis-run services-start services-stop
+.PHONY: deps tools lint protoc mock test integration-test all-test cover build run docker-run redis-run services-start services-stop

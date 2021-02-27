@@ -1,3 +1,5 @@
+// +build integration_tests
+
 package storage_test
 
 import (
@@ -8,7 +10,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/ory/dockertest"
+	"github.com/ory/dockertest/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"github.com/tamarakaufler/grpc-char-vs-rune/internal/storage"

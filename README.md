@@ -53,6 +53,14 @@ run and stop using docker-compose:
 
 #### redis - in-memory store
 
+## testing
+
+### unit testing
+
+### integration testing
+
+redis methods for storing and retrieval are tested with the help of dockertest (github.com/ory/dockertest/v3). The module provides a redis docker container without the need for using docker-compose. These tests are strictly speaking unit tests, but as they require docker, they are tagged as intergration_tests.
+
 #### telegraph - StatsD metrics server
 
 NOTE
