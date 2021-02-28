@@ -1,6 +1,7 @@
 version: "3.3"
 services:
   char_vs_rune:
+    container_name: grpc-char_vs_rune
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -10,11 +11,13 @@ services:
       - redis
 
   redis:
-    image: "redis:latest"
+    container_name: redis
+    image: "redis:5-alpine"
     ports:
       - 6379:6379
 
   influxdb:
+    container_name: influxdb
     image: quay.io/influxdb/influxdb:v2.0.3
     ports:
       - 8086:8086
@@ -24,6 +27,7 @@ services:
 
   # Use the influx cli to set up an influxdb instance.
   influxdb_cli:
+    container_name: influxdb-cli
     links:
       - influxdb
     image: quay.io/influxdb/influxdb:v2.0.3
@@ -35,6 +39,7 @@ services:
       - influxdb
 
   telegraf:
+    container_name: telegraph
     image: docker.io/library/telegraf:latest
     ports:
       - 8125:8125

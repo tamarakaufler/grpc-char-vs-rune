@@ -27,19 +27,38 @@ mock:
 	$(MAKE) -C ./client mocks
 	go generate ./..
 
-test:
+unit-test:
 	go test -count=1 -tags unit_tests --race -covermode=atomic -coverprofile=coverage1.out ./...
 
 integration-test:
 	go test -count=1 -tags integration_tests --race -covermode=atomic -coverprofile=coverage2.out ./...
 
-all-test:
+# runs both unit and integration tests
+test:
 	go test -count=1 -tags unit_tests,integration_tests --race -covermode=atomic -coverprofile=coverage.out ./...	
 
-# acceptance-bin:
-# 	CGO_ENABLED=0 go test -o bin/acceptancetests -c -v -tags acceptance_test \
-# 	./acceptance_test ./acceptance
+# CGO_ENABLED=0 is crucial for the test binary to run in the container. If not provided (CGO_ENABLED=1 is the default),
+# running the image results in:
+#		standard_init_linux.go:219: exec user process caused: no such file or directory
+# even though the test binary was copied correctly and present in the image. GO_ENABLED=0 produces a statically linked binary,
+# which is needed as the alpine image does not contain all the required libraries out of the box.
+# The message "no such file or directory" refers to a missing C library.
+acceptance-bin:
+	CGO_ENABLED=0 go test -o cmd/bin/acceptancetests -c -v -tags acceptance_tests ./acceptance
 
+acceptance-test:
+	go test -count=1 -tags acceptance_tests ./acceptance
+
+acceptance-compose-run: acceptance-bin
+	cd acceptance-ci && docker-compose up --force-recreate
+	cd ..
+	@#docker-compose up --force-recreate -f acceptance-ci/docker-compose.yml; cd ..
+
+acceptance-image: acceptance-bin
+	docker build -t grpc-char-vs-rune-test:v1.0.0 -f acceptance-ci/Dockerfile .
+
+acceptance-image-run:
+	docker run grpc-char-vs-rune-test:v1.0.0
 
 build: LDFLAGS += -X 'main.Timestamp=$(shell date +%s)'
 build: LDFLAGS += -X 'main.ServiceVersion=${VERSION}'
@@ -49,20 +68,21 @@ build:
 	$(info building binary cmd/bin/$(NAME) with flags $(LDFLAGS))
 	@go build -race -o cmd/bin/$(NAME) -ldflags "$(LDFLAGS)" cmd/char-vs-rune/main.go
 
-run:
+redis-run:
+	docker-compose up -d redis
+
+run: build redis-run
 	cmd/bin/$(NAME)
 
 docker-run:
 # 	docker build -t grpc-char-vs-rune:v1.0.0 .
 # 	docker run -w /basedir -v $(PWD):/basedir --env AAA=aaa --env BBB=3 grpc-char-vs-rune:v1.0.0
 
-redis-run:
-	docker-compose up -d redis
-
 # starts grpc-char-vs-rune, redis, telegraph and influxdb
 services-start:
 	docker-compose up -d
 
+# stops grpc-char-vs-rune, redis, telegraph and influxdb
 services-stop:
 	docker-compose stop
 	docker-compose down --remove-orphans
@@ -72,6 +92,8 @@ cover:
 	go test -failfast -coverpkg=./... -coverprofile=$$TMP_COV ./... && \
 	go tool cover -html=$$TMP_COV && rm $$TMP_COV
 
-all: deps protoc lint all-test build
 
-.PHONY: deps tools lint protoc mock test integration-test all-test cover build run docker-run redis-run services-start services-stop
+all: deps protoc lint test acceptance-bin build
+
+.PHONY: deps tools lint protoc mock unit-test integration-test test acceptance-bin acceptance-test acceptance-run acceptance-image \
+cover build run docker-run redis-run services-start services-stop cover
