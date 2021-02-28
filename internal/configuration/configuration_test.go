@@ -36,6 +36,7 @@ func TestLoad(t *testing.T) {
 					MinIdleConns: 3,
 					MaxRetries:   10,
 					DB:           0,
+					TTL:          time.Duration(1 * time.Second),
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "localhost:8125",
@@ -61,6 +62,7 @@ func TestLoad(t *testing.T) {
 					MinIdleConns: 3,
 					MaxRetries:   10,
 					DB:           0,
+					TTL:          time.Duration(1 * time.Second),
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "localhost:8125",
@@ -88,6 +90,7 @@ func TestLoad(t *testing.T) {
 					MinIdleConns: 3,
 					MaxRetries:   10,
 					DB:           0,
+					TTL:          time.Duration(1 * time.Second),
 				},
 				Metrics: conf.Metrics{
 					StatsdAddress: "127.0.0.1:6666",

@@ -27,6 +27,7 @@ type Redis struct {
 	MinIdleConns int           `env:"REDIS_MIN_RETRIES" envDefault:"3"`
 	MaxRetries   int           `env:"REDIS_MAX_RETRIES" envDefault:"10"`
 	DB           int           `env:"REDIS_DB" envDefault:"0"`
+	TTL          time.Duration `env:"REDIS_TTL" envDefault:"1s"`
 }
 
 // Metrics represents the configuration for metrics.
