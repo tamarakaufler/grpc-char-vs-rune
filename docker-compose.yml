@@ -33,7 +33,7 @@ services:
     image: quay.io/influxdb/influxdb:v2.0.3
     # Use the same configuration parameters in the telegraf configuration.
     entrypoint: influx setup --bucket char_vs_rune -t mytoken -o noprofit-org --username=myself --password=mypassword --host=http://influxdb:8086 -f
-    # Wait until the influxd service in the influxdb container is bootstrapped before strting the setup of the influxdb instance . 
+    # Wait until the influxd service in the influxdb container is bootstrapped before starting the setup.
     restart: on-failure:20
     depends_on:
       - influxdb

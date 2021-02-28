@@ -59,7 +59,19 @@ run and stop using docker-compose:
 
 ### integration testing
 
-redis methods for storing and retrieval are tested with the help of dockertest (github.com/ory/dockertest/v3). The module provides a redis docker container without the need for using docker-compose. These tests are strictly speaking unit tests, but as they require docker, they are tagged as intergration_tests.
+redis methods for storing and retrieval are tested with the help of dockertest (github.com/ory/dockertest/v3). The dockertest module provides a redis docker container without the need for using docker-compose. These tests are strictly speaking unit tests, but as they require docker, they are tagged as intergration_tests.
+
+###
+
+## Metrics
+
+Metrics sent using the StatsD protocol to Telegraf, the StatsD aware service that stores the data in a timne-series database influxdb database.
+
+The required services, telegraph and influxdb, are started using _make start-services_ task, that also starts the grpc-char-to-rune service.
+
+### TODO
+
+Send the metrics
 
 #### telegraph - StatsD metrics server
 
