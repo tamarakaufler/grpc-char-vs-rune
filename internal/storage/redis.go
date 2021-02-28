@@ -13,8 +13,6 @@ import (
 	libLogger "github.com/tamarakaufler/grpc-char-vs-rune/internal/lib-service-run/logger"
 )
 
-var ttl = 3600 * time.Second
-
 // charToRune is a helper type used for storing data in redis.
 type charToRune struct {
 	List []uint32 `json:"list,omitempty"`
@@ -51,7 +49,7 @@ func New(cfg conf.Configuration) *Redis {
 			MaxRetries:   cfg.MaxRetries,
 			DB:           0,
 		}),
-		TTL: ttl,
+		TTL: cfg.TTL,
 	}
 }
 
