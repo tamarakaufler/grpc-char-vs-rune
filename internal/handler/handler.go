@@ -72,20 +72,21 @@ func (h *Handler) ToRune(ctx context.Context, req *proto.ToRuneRequest) (*proto.
 
 	// get cached
 	v, err := h.Clients.Redis.GetCharToRune(ctx, s)
+	fmt.Printf("ToRune: %s ... %v\n", s, v)
+
 	if err != nil {
-		h.Logger.Warnf("Cannot get key %s from redis", s)
+		if err.Error() != "redis: nil" {
+			h.Logger.Warnf("problem with redis: %s", s)
+		}
 	} else {
-		rs := ConvertToRuneResponse(s, v)
+		rs := ConvertToRuneResponse(v)
 		return rs, nil
 	}
 
 	r, m := ConvertToRune(s)
-	if err != nil {
-		return nil, errors.Wrapf(err, "cannot convert string %s to runes", s)
-	}
 
 	// cache the conversion
-	err = h.Clients.Redis.StoreCharToRune(ctx, s, v)
+	err = h.Clients.Redis.StoreCharToRune(ctx, s, r)
 	if err != nil {
 		h.Logger.Warnf("Cannot store key %s in redis", s)
 	}
@@ -117,10 +118,14 @@ func ConvertToChar(rs []rune) string {
 // helper functions/methods
 
 // ConvertToRuneResponse ...
-func ConvertToRuneResponse(s string, v []uint32) *proto.ToRuneResponse {
-	m := make(map[string]uint32, len(s))
-	for i, ch := range s {
-		ch := fmt.Sprint(ch)
+// TODO: unit test
+// The index i when ranging over a string, may not be sequential as
+// the looping goes through runes, which may be more than 1 byte,
+// and the index refers to the byte position.
+func ConvertToRuneResponse(v []uint32) *proto.ToRuneResponse {
+	m := make(map[string]uint32, len(v))
+	for i := range v {
+		ch := fmt.Sprintf("%q", v[i])
 		m[ch] = v[i]
 	}
 

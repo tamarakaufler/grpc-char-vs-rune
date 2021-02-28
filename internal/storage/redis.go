@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"time"
+	"unicode/utf8"
 
 	red "github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
@@ -107,4 +108,13 @@ func (r *Redis) GetRuneToChar(ctx context.Context, rs []byte) (string, error) {
 	}
 
 	return v, nil
+}
+
+// RuneToUint32 creates a list of uint32/runes corresponding to the provided string.
+func RuneToUint32(s string) []uint32 {
+	uis := make([]uint32, utf8.RuneCountInString(s))
+	for i, r := range []rune(s) {
+		uis[i] = uint32(r)
+	}
+	return uis
 }

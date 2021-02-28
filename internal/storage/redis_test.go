@@ -7,7 +7,6 @@ import (
 	"net"
 	"testing"
 	"time"
-	"unicode/utf8"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/ory/dockertest/v3"
@@ -58,7 +57,7 @@ func TestRedisStorage(t *testing.T) {
 	t.Run("StoreRetrieveCharToRune", func(t *testing.T) {
 		ctx := context.Background()
 		s := "Hello 日本"
-		expected := runeToUint32(s)
+		expected := storage.RuneToUint32(s)
 
 		// TTL set through expire cannot be less than 1 second
 		d := 2 * time.Second
@@ -128,13 +127,4 @@ func setup(t *testing.T) (*redis.Client, func()) {
 	client := redis.NewClient(&redis.Options{Addr: addr})
 
 	return client, cleanupRedisF
-}
-
-// runeToUint32 creates a list of uint32/runes corresponding to the provided string.
-func runeToUint32(s string) []uint32 {
-	uis := make([]uint32, utf8.RuneCountInString(s))
-	for i, r := range []rune(s) {
-		uis[i] = uint32(r)
-	}
-	return uis
 }
