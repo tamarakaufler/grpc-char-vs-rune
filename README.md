@@ -2,9 +2,10 @@
 
 # Synopsis
 
-gRPC service, written in Go, to provide convertions between characters/strings and runes/bytes.
+An examle of a gRPC service, written in Go.
+The service provides convertions between strings and runes.
 
-It will be used with other gRPC and REST services, running locally using docker-compose
+To be used with other gRPC and REST services, running locally using docker-compose
 or running in a Kubernetes cluster.
 
 # Implementation
@@ -13,11 +14,13 @@ or running in a Kubernetes cluster.
 
 - Go
 - gRPC
-- redis for caching
-- golangci-lint for code quality (https://raw.githubusercontent.com/golangci/golangci-lint/master/.golangci.example.yml)
 - protobufs generated with prototool
 - mocks generated with counterfeiter
+- redis for caching
+- golangci-lint for code quality (https://raw.githubusercontent.com/golangci/golangci-lint/master/.golangci.example.yml)
+- dockertest for integration testing
 - docker, docker-compose
+- telegraf and informixdb for metrics
 
 ## Details
 
