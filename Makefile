@@ -30,12 +30,19 @@ mock:
 unit-test:
 	go test -count=1 -tags unit_tests --race -covermode=atomic -coverprofile=coverage1.out ./...
 
-integration-test:
+redis-integration-test:
 	go test -count=1 -tags integration_tests --race -covermode=atomic -coverprofile=coverage2.out ./...
+
+handler-integration-test:
+	@# change to a different directory only affects this line. Use && to string all make task commands to
+	@# propagate the directory change
+	cd integration && docker-compose up -d
+	go test -count=1 -tags integration_tests --race -covermode=atomic -coverprofile=coverage3.out ./integration/...
+	cd integration && docker-compose down --remove-orphans
 
 # runs both unit and integration tests
 test:
-	go test -count=1 -tags unit_tests,integration_tests --race -covermode=atomic -coverprofile=coverage.out ./...	
+	go test -count=1 -tags unit_tests,integration_tests --race -covermode=atomic -coverprofile=coverage.out ./internal/...
 
 # CGO_ENABLED=0 is crucial for the test binary to run in the container. If not provided (CGO_ENABLED=1 is the default),
 # running the image results in:
@@ -51,8 +58,6 @@ acceptance-test:
 
 acceptance-compose-run: acceptance-bin
 	cd acceptance-ci && docker-compose up --force-recreate
-	cd ..
-	@#docker-compose up --force-recreate -f acceptance-ci/docker-compose.yml; cd ..
 
 acceptance-image: acceptance-bin
 	docker build -t grpc-char-vs-rune-test:v1.0.0 -f acceptance-ci/Dockerfile .
@@ -66,12 +71,13 @@ build: LDFLAGS += -X 'main.GitSHA=${GIT_SHA}'
 build: LDFLAGS += -X 'main.ServiceName=${FULL_NAME}'
 build:
 	$(info building binary cmd/bin/$(NAME) with flags $(LDFLAGS))
-	@go build -race -o cmd/bin/$(NAME) -ldflags "$(LDFLAGS)" cmd/char-vs-rune/main.go
+	go build -race -o cmd/bin/$(NAME) -ldflags "$(LDFLAGS)" cmd/char-vs-rune/main.go
+	#@gCGO_ENABLED=0 go build -race -o cmd/bin/$(NAME) -ldflags "$(LDFLAGS)" cmd/char-vs-rune/main.go
 
 redis-run:
 	docker-compose up -d redis
 
-run: build redis-run
+run:
 	cmd/bin/$(NAME)
 
 docker-run:
@@ -92,8 +98,9 @@ cover:
 	go test -failfast -coverpkg=./... -coverprofile=$$TMP_COV ./... && \
 	go tool cover -html=$$TMP_COV && rm $$TMP_COV
 
+cleanup: services-stop
 
-all: deps protoc lint test acceptance-bin build
+all: deps protoc lint test handler-integration-test acceptance-bin build
 
-.PHONY: deps tools lint protoc mock unit-test integration-test test acceptance-bin acceptance-test acceptance-run acceptance-image \
-cover build run docker-run redis-run services-start services-stop cover
+.PHONY: deps tools lint protoc mock unit-test redis-integration-test handler-integration-test test acceptance-bin acceptance-test acceptance-run acceptance-image \
+cover build run docker-run redis-run services-start services-stop cover cleanup
