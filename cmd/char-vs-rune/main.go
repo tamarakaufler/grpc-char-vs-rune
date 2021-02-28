@@ -37,7 +37,7 @@ func main() {
 
 	cfg, err := conf.Load()
 	if err != nil {
-		logrus.Panicf("cannot start grpc-char-vs-rune: %v", err)
+		logrus.Panicf("cannot load configuration: %v", err)
 	}
 
 	// Setting up the gRPC server.
