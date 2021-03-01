@@ -53,9 +53,6 @@ run and stop using docker-compose:
   - make services-start
   - make services-stop
 
-
-#### redis - in-memory store
-
 ## testing
 
 ### unit testing
