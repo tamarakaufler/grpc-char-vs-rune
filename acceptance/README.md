@@ -10,6 +10,7 @@ After the correspoding REST service is implemented
   - scratch environment must be set up:
         as a scratch cloud cluster with a particular namespace, where the relevant services that the
         acceptance testing needs, are running
+
                 OR
   - using docker-compose setting up all the relevant services that the acceptance testing needs running
 
