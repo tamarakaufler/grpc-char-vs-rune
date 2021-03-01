@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"time"
 	"unicode/utf8"
@@ -89,8 +88,7 @@ func (r *Redis) GetCharToRune(ctx context.Context, key string) ([]uint32, error)
 }
 
 // StoreRuneToChar ...
-func (r *Redis) StoreRuneToChar(ctx context.Context, rs []byte, s string) error {
-	key := base64.StdEncoding.EncodeToString(rs)
+func (r *Redis) StoreRuneToChar(ctx context.Context, key, s string) error {
 	err := r.Client.Set(ctx, key, s, r.TTL).Err()
 	if err != nil {
 		return err
@@ -100,9 +98,9 @@ func (r *Redis) StoreRuneToChar(ctx context.Context, rs []byte, s string) error 
 }
 
 // GetRuneToChar ...
-func (r *Redis) GetRuneToChar(ctx context.Context, rs []byte) (string, error) {
-	key := base64.StdEncoding.EncodeToString(rs)
+func (r *Redis) GetRuneToChar(ctx context.Context, key string) (string, error) {
 	v, err := r.Client.Get(ctx, key).Result()
+
 	if err != nil {
 		return "", err
 	}

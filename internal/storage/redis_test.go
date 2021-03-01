@@ -12,6 +12,7 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+	"github.com/tamarakaufler/grpc-char-vs-rune/internal/handler"
 	"github.com/tamarakaufler/grpc-char-vs-rune/internal/storage"
 )
 
@@ -24,32 +25,31 @@ func TestRedisStorage(t *testing.T) {
 	t.Run("StoreRetrieveRuneToChar", func(t *testing.T) {
 		ctx := context.Background()
 		s := "Hello 日本"
-		rs := []byte(s)
+		uis := []uint32{72, 101, 108, 108, 111, 32, 26085, 26412}
 		d := 200 * time.Millisecond
 
 		r := &storage.Redis{
 			Client: redisClient,
 			TTL:    time.Duration(d),
 		}
-		err := r.StoreRuneToChar(ctx, rs, s)
+
+		k := handler.Uint32ListToBase64(uis)
+		err := r.StoreRuneToChar(ctx, k, s)
 		require.NoError(t, err)
 
-		v, err := r.GetRuneToChar(ctx, rs)
+		v, err := r.GetRuneToChar(ctx, k)
 		require.NoError(t, err)
 		require.Equal(t, s, v)
 
-		tick := time.After(d)
-		select {
-		case <-tick:
-			v, err := r.GetRuneToChar(ctx, rs)
-			require.EqualError(t, err, "redis: nil")
-			require.Equal(t, "", v)
-		}
+		<-time.After(d)
+		v, err = r.GetRuneToChar(ctx, k)
+		require.EqualError(t, err, "redis: nil")
+		require.Equal(t, "", v)
 
-		err = r.StoreRuneToChar(ctx, rs, s)
+		err = r.StoreRuneToChar(ctx, k, s)
 		require.NoError(t, err)
 
-		v, err = r.GetRuneToChar(ctx, rs)
+		v, err = r.GetRuneToChar(ctx, k)
 		require.NoError(t, err)
 		require.Equal(t, s, v)
 	})
@@ -74,12 +74,10 @@ func TestRedisStorage(t *testing.T) {
 		require.NoError(t, err)
 		require.EqualValues(t, expected, v)
 
-		select {
-		case <-time.After(d):
-			v, err := r.GetCharToRune(ctx, s)
-			require.EqualError(t, err, "redis: nil")
-			require.Equal(t, []uint32(nil), v)
-		}
+		<-time.After(d)
+		v, err = r.GetCharToRune(ctx, s)
+		require.EqualError(t, err, "redis: nil")
+		require.Equal(t, []uint32(nil), v)
 
 		err = r.StoreCharToRune(ctx, s, expected)
 		require.NoError(t, err)
@@ -90,7 +88,7 @@ func TestRedisStorage(t *testing.T) {
 	})
 }
 
-// setup brings up redis container
+// setup brings up redis container.
 func setup(t *testing.T) (*redis.Client, func()) {
 	t.Helper()
 

@@ -1,3 +1,5 @@
+// +build integration_tests
+
 package handler_test
 
 import (
@@ -16,26 +18,18 @@ import (
 	"github.com/tamarakaufler/grpc-char-vs-rune/internal/storage"
 )
 
-func TestHandler(t *testing.T) {
+func TestToRune(t *testing.T) {
 	h := setup(t)
 	defer t.Cleanup(cleanup)
 
 	fmt.Println("Hello friend")
 
-	pong, err := h.Clients.Redis.Client.Ping(context.Background()).Result()
-	require.NoError(t, err)
-	require.NotNil(t, pong)
+	t.Run("Test_parallel_1", func(t *testing.T) {
+		t.Parallel()
 
-	require.NotEqual(t, "Hello", "World")
-
-	t.Run("ToRune", func(t *testing.T) {
 		ctx := context.Background()
 		s := "Hello 日本"
 		expected := storage.RuneToUint32(s)
-
-		pong, err := h.Clients.Redis.Client.Ping(ctx).Result()
-		require.NoError(t, err)
-		require.NotNil(t, pong)
 
 		// err = h.Clients.Redis.StoreCharToRune(ctx, s, expected)
 		// require.NoError(t, err)
@@ -56,6 +50,71 @@ func TestHandler(t *testing.T) {
 		require.EqualValues(t, expected, res.GetRunes())
 	})
 
+	t.Run("Test_parallel_2", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := context.Background()
+		s := "Hello 日本"
+		expected := storage.RuneToUint32(s)
+
+		// string not cached
+		req := &proto.ToRuneRequest{From: s}
+		res, err := h.ToRune(ctx, req)
+		require.NoError(t, err)
+		require.EqualValues(t, expected, res.GetRunes())
+
+		// string cached
+		res, err = h.ToRune(ctx, req)
+		require.NoError(t, err)
+		require.EqualValues(t, expected, res.GetRunes())
+	})
+}
+
+func TestToChar(t *testing.T) {
+	h := setup(t)
+	defer t.Cleanup(cleanup)
+
+	fmt.Println("Hello foe")
+
+	t.Run("Test_parallel_1", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := context.Background()
+		rs := []uint32{72, 101, 108, 108, 111, 32, 26085, 26412}
+		expected := "Hello 日本"
+
+		// string not cached
+		req := &proto.ToCharRequest{Runes: rs}
+
+		res, err := h.ToChar(ctx, req)
+		require.NoError(t, err)
+		require.EqualValues(t, expected, res.GetTo())
+
+		// string cached
+		res, err = h.ToChar(ctx, req)
+		require.NoError(t, err)
+		require.EqualValues(t, expected, res.GetTo())
+	})
+
+	t.Run("Test_parallel_2", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := context.Background()
+		rs := []uint32{72, 101, 108, 108, 111, 32, 26085, 26412}
+		expected := "Hello 日本"
+
+		// string not cached
+		req := &proto.ToCharRequest{Runes: rs}
+
+		res, err := h.ToChar(ctx, req)
+		require.NoError(t, err)
+		require.EqualValues(t, expected, res.GetTo())
+
+		// string cached
+		res, err = h.ToChar(ctx, req)
+		require.NoError(t, err)
+		require.EqualValues(t, expected, res.GetTo())
+	})
 }
 
 func setup(t *testing.T) *handler.Handler {

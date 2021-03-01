@@ -2,7 +2,10 @@ package handler
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
+	"strings"
+	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -16,6 +19,8 @@ import (
 type Handler struct {
 	Logger  *logrus.Entry
 	Clients *service.Clients
+
+	mux *sync.Mutex
 }
 
 var _ proto.CharVsRuneServer = (*Handler)(nil)
@@ -26,10 +31,13 @@ func New(l *logrus.Entry, cfg configuration.Configuration) *Handler {
 	return &Handler{
 		Logger:  l,
 		Clients: clients,
+
+		mux: &sync.Mutex{},
 	}
 }
 
 // ToChar ... the service must satisfy the CharVsRuneServer interface.
+// This is a very contrived example. No need to cache.
 func (h *Handler) ToChar(ctx context.Context, req *proto.ToCharRequest) (*proto.ToCharResponse, error) {
 	if req == nil || req.GetRunes() == nil {
 		return nil, errors.New("no runes to convert to string")
@@ -37,23 +45,28 @@ func (h *Handler) ToChar(ctx context.Context, req *proto.ToCharRequest) (*proto.
 	uis := req.GetRunes()
 
 	// get cached
-	rs := []rune{}
-	for _, ui := range uis {
-		rs = append(rs, rune(ui))
-	}
+	key := Uint32ListToBase64(uis)
 
-	b := []byte(string(rs))
-	s, err := h.Clients.Redis.GetRuneToChar(ctx, b)
+	fmt.Printf("---> ToChar: key %s", key)
+
+	s, err := h.Clients.Redis.GetRuneToChar(ctx, key)
 	if err != nil {
-		h.Logger.Warnf("Cannot get key for %v from redis", rs)
+		if err.Error() != "redis: nil" {
+			h.Logger.Warnf("Cannot get key for %v from redis", uis)
+		}
 	} else {
 		return &proto.ToCharResponse{
 			To: s,
 		}, nil
 	}
 
+	s = ConvertToChar(uis)
+	fmt.Printf("\t\t### %v\n", s)
+
 	// cache the conversion
-	err = h.Clients.Redis.StoreRuneToChar(ctx, b, s)
+	h.mux.Lock()
+	err = h.Clients.Redis.StoreRuneToChar(ctx, key, s)
+	h.mux.Unlock()
 	if err != nil {
 		h.Logger.Warnf("Cannot store key for %v in redis", uis)
 	}
@@ -72,11 +85,9 @@ func (h *Handler) ToRune(ctx context.Context, req *proto.ToRuneRequest) (*proto.
 
 	// get cached
 	v, err := h.Clients.Redis.GetCharToRune(ctx, s)
-	fmt.Printf("ToRune: %s ... %v\n", s, v)
-
 	if err != nil {
 		if err.Error() != "redis: nil" {
-			h.Logger.Warnf("problem with redis: %s", s)
+			h.Logger.Warnf("problem with redis: %s", err)
 		}
 	} else {
 		rs := ConvertToRuneResponse(v)
@@ -86,7 +97,9 @@ func (h *Handler) ToRune(ctx context.Context, req *proto.ToRuneRequest) (*proto.
 	r, m := ConvertToRune(s)
 
 	// cache the conversion
+	h.mux.Lock()
 	err = h.Clients.Redis.StoreCharToRune(ctx, s, r)
+	h.mux.Unlock()
 	if err != nil {
 		h.Logger.Warnf("Cannot store key %s in redis", s)
 	}
@@ -111,7 +124,14 @@ func ConvertToRune(s string) ([]uint32, map[string]uint32) {
 }
 
 // ConvertToChar converts provided runes to string.
-func ConvertToChar(rs []rune) string {
+func ConvertToChar(uis []uint32) string {
+	rs := []rune{}
+	for _, ui := range uis {
+		rs = append(rs, rune(ui))
+	}
+
+	fmt.Printf("\t\t### %v\n", string(rs))
+
 	return string(rs)
 }
 
@@ -133,4 +153,13 @@ func ConvertToRuneResponse(v []uint32) *proto.ToRuneResponse {
 		Runes:   v,
 		Mapping: m,
 	}
+}
+
+// Uint32ListToBase64 converts a []uint32 into a base64 string.
+func Uint32ListToBase64(uis []uint32) string {
+	var sb strings.Builder
+	for _, ui := range uis {
+		sb.WriteString(string(rune(ui)))
+	}
+	return base64.StdEncoding.EncodeToString([]byte(sb.String()))
 }
