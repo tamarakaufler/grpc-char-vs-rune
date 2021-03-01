@@ -44,7 +44,8 @@ handler-integration-test:
 test:
 	go test -count=1 -tags unit_tests,integration_tests --race -covermode=atomic -coverprofile=coverage.out ./internal/...
 
-# CGO_ENABLED=0 is crucial for the test binary to run in the container. If not provided (CGO_ENABLED=1 is the default),
+# CGO_ENABLED=0 is crucial for the test binary to run in the container, if using the small
+# base alpine image without installing additional libraries. If not provided (CGO_ENABLED=1 is the default),
 # running the image results in:
 #		standard_init_linux.go:219: exec user process caused: no such file or directory
 # even though the test binary was copied correctly and present in the image. GO_ENABLED=0 produces a statically linked binary,
@@ -57,10 +58,10 @@ acceptance-test:
 	go test -count=1 -tags acceptance_tests ./acceptance
 
 acceptance-compose-run: acceptance-bin
-	cd acceptance-ci && docker-compose up --force-recreate
+	cd acceptance-run && docker-compose up --force-recreate
 
 acceptance-image: acceptance-bin
-	docker build -t grpc-char-vs-rune-test:v1.0.0 -f acceptance-ci/Dockerfile .
+	docker build -t grpc-char-vs-rune-test:v1.0.0 -f acceptance-run/Dockerfile .
 
 acceptance-image-run:
 	docker run grpc-char-vs-rune-test:v1.0.0

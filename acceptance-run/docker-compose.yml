@@ -4,4 +4,4 @@ services:
     container_name: grpc-char-vs-rune-test # providing a custom name rather than a generated default one. Because of that, only one container allowed as each container name must be unique.
     build:
       context: ../
-      dockerfile: acceptance-ci/Dockerfile
+      dockerfile: acceptance-run/Dockerfile
