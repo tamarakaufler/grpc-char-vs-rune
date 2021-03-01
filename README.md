@@ -2,7 +2,7 @@
 
 # Synopsis
 
-An examle of a gRPC service, written in Go.
+An example of a gRPC service, written in Go.
 The service provides convertions between strings and runes.
 
 To be used with other gRPC and REST services, running locally using docker-compose
@@ -32,7 +32,7 @@ a) proto description (char-vs-rune.proto)
 
     option go_package = "github.com/tamarakaufler/grpc-char-vs-rune/client/char_vs_rune";
 
-    the last part _char_vs_rune_ msut not contain dashes
+the last part _char_vs_rune_ must not contain dashes
 
 b) If there is an issue regarding the go_package line during the generation, try upgrading the protoc and the Go grpc related plugins.
 
