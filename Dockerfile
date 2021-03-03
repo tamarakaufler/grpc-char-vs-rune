@@ -11,7 +11,7 @@ RUN echo ${LD_FLAGS}
 
 # a) for golangci-lint to work either libc-dev needs to be installed or
 # CGO_ENABLED=0 must be set
-# b) libc-dev installed are prerequisites for running
+# b) libc-dev installed is a prerequisite for running
 # go test with the -race flag
 RUN apk add --no-cache curl tzdata gcc libc-dev
 
@@ -22,6 +22,7 @@ ENV GOARCH=amd64
 
 COPY . .
 
+# During the CI/CD run (Jenkins etc), Athens Go modules server needs running in the cluster.
 RUN go mod download
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ${GOPATH}/bin ${GOLANGCI_VERSION}
 
